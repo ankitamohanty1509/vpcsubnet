@@ -1,11 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: VPC with public/private subnets and security group
-
-Parameters:
-  VPCCidr:
-    Type: String
-    Default: 10.0.0.0/16
-
 Resources:
 
   MyVpc:
@@ -16,13 +10,13 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: !Sub "StackSet-VPC_${AWS::Region}"
+          Value: !Sub "StackSet-VPC-${AWS::Region}"
 
   PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref MyVpc
-      CidrBlock: 10.0.1.0/24
+      CidrBlock: !Ref PublicSubnet1Cidr
       AvailabilityZone: !Select [0, !GetAZs '']
       MapPublicIpOnLaunch: true
       Tags:
@@ -33,7 +27,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref MyVpc
-      CidrBlock: 10.0.2.0/24
+      CidrBlock: !Ref PublicSubnet2Cidr
       AvailabilityZone: !Select [1, !GetAZs '']
       MapPublicIpOnLaunch: true
       Tags:
@@ -44,7 +38,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref MyVpc
-      CidrBlock: 10.0.3.0/24
+      CidrBlock: !Ref PrivateSubnet1Cidr
       AvailabilityZone: !Select [0, !GetAZs '']
       MapPublicIpOnLaunch: false
       Tags:
@@ -55,7 +49,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref MyVpc
-      CidrBlock: 10.0.4.0/24
+      CidrBlock: !Ref PrivateSubnet2Cidr
       AvailabilityZone: !Select [1, !GetAZs '']
       MapPublicIpOnLaunch: false
       Tags:
@@ -71,11 +65,11 @@ Resources:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: 0.0.0.0/0
+          CidrIp: !Ref SSHCidr
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-          CidrIp: 0.0.0.0/0
+          CidrIp: !Ref HTTPCidr
       Tags:
         - Key: Name
           Value: "WebSecurityGroup"
